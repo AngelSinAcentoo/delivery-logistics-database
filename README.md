@@ -1,21 +1,19 @@
 # Delivery Logistics Database
 
-Modelo relacional para administrar paquetes, centros locales, camiones,
-conductores, rutas y envíos nacionales o internacionales.
+A relational model for packages, local distribution centers, trucks, drivers, routes, and domestic or international shipments.
 
-> **English summary:** A normalized SQL Server logistics database with
-> anonymized seed data, analytical queries and an isolated integration test.
+The repository contains anonymized seed data, analytical queries, SQL Server programmability objects, and an isolated integration test.
 
-## Mejoras sobre el ejercicio original
+## Changes from the original exercise
 
-- Datos de ejemplo completamente ficticios y sin RFC ni direcciones reales.
-- Claves primarias en tablas de relación.
-- Restricciones `CHECK`, claves únicas e índices.
-- Separación entre esquema, datos, consultas y reinicio.
-- Vista, procedimiento almacenado y disparador set-based.
-- Prueba de integración sobre una base temporal.
+- All sample data is fictional. It contains no real tax identifiers or addresses.
+- Relationship tables have explicit primary keys.
+- The schema includes `CHECK` constraints, unique keys, and indexes.
+- Schema, seed data, queries, programmability objects, and cleanup are separated.
+- The trigger is set based and handles multi-row operations.
+- The integration test runs against a temporary database.
 
-## Modelo
+## Model
 
 ```mermaid
 erDiagram
@@ -29,31 +27,27 @@ erDiagram
     TRUCK ||--o{ DRIVER_TRUCK_ASSIGNMENT : assigned
 ```
 
-## Archivos
+## Repository structure
 
-- `sql/01_schema.sql`: tablas, restricciones e índices.
-- `sql/02_seed.sql`: datos ficticios.
-- `sql/03_queries.sql`: consultas demostrativas.
-- `sql/04_programmability.sql`: vista, procedimiento y auditoría por disparador.
-- `sql/99_reset.sql`: eliminación ordenada de objetos.
-- `tests/assertions.sql`: invariantes del modelo.
+- `sql/01_schema.sql`: tables, constraints, and indexes
+- `sql/02_seed.sql`: fictional sample data
+- `sql/03_queries.sql`: demonstration queries
+- `sql/04_programmability.sql`: view, stored procedure, and audit trigger
+- `sql/99_reset.sql`: ordered object cleanup
+- `tests/assertions.sql`: model invariants
 
-## Probar
+## Run the integration test
 
-Requiere SQL Server y `sqlcmd`. La prueba crea una base con nombre
-`PortfolioLogisticsTest_<identificador>`, carga todos los scripts, ejecuta las
-aserciones y elimina esa base en un bloque `finally`.
+The test requires SQL Server and `sqlcmd`. It creates a database named `PortfolioLogisticsTest_<identifier>`, loads every script, runs the assertions, and removes the database in a `finally` block.
 
 ```powershell
 .\run-tests.ps1
 ```
 
-Para usar otra instancia:
+To use another SQL Server instance:
 
 ```powershell
 .\run-tests.ps1 -Server ".\SQLEXPRESS"
 ```
 
-Los objetos de programabilidad fueron incorporados a partir de ejercicios de
-`BD-2026-2`. El disparador usa las tablas lógicas `inserted` y `deleted` de
-forma set-based, por lo que soporta actualizaciones de varias filas sin cursor.
+The programmability objects originated in coursework from `BD-2026-2`. The trigger uses the `inserted` and `deleted` logical tables and supports multi-row updates without a cursor.
